@@ -46,6 +46,7 @@ componentWillMount() {
                               longitude: location.coords.longitude, 
                               latitudeDelta: this.state.region.latitudeDelta, 
                               longitudeDelta: this.state.region.longitudeDelta }});
+    this.props.fetchFlights(this.state.region);
   };
 
   componentDidMount() {
@@ -53,14 +54,13 @@ componentWillMount() {
   }
 
   onRegionChangeComplete = (region) => {
-    console.log(region);
-    this.setState({ region });
+    this.props.fetchFlights(region);
+    this.setState({ region});
   }
 
-  onButtonPress = () => {
-    this.props.fetchFlights(this.state.region, () => {
-      //this.props.navigation.navigate('deck');
-    });
+  _getFlightAngle(flight) {
+    // This is because 90º image rotation
+    return (flight.Trak -90)+'deg';
   }
 
   renderPoints = () => {    
@@ -72,7 +72,7 @@ componentWillMount() {
             title={flight.Icao}
             coordinate={{latitude: flight.Lat, longitude: flight.Long}}
             image={flightImg} 
-            style={{ transform: [{ rotate: '30deg'}] }}           
+            style={{ transform: [{ rotate: this._getFlightAngle(flight)}] }}           
         />
       );
     });
@@ -95,27 +95,9 @@ componentWillMount() {
           onRegionChangeComplete={this.onRegionChangeComplete}
         >
           {this.renderPoints()}
-        </MapView>
-        <View style={styles.buttonContainer}>
-          <Button
-            large
-            title="Search This Area"
-            backgroundColor="#009688"
-            icon={{ name: 'search' }}
-            onPress={this.onButtonPress}
-          />
-        </View>
+        </MapView>        
       </View>
     );
-  }
-}
-
-const styles = {
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0
   }
 }
 
