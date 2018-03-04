@@ -6,6 +6,8 @@ import { Button, Icon } from 'react-native-elements';
 
 import * as actions from '../actions';
 
+import flightImg from '../assets/plane.png';
+
 class MapScreen extends Component {
   static navigationOptions = {
     title: 'Map'
@@ -69,6 +71,8 @@ componentWillMount() {
             key={flight.Id}
             title={flight.Icao}
             coordinate={{latitude: flight.Lat, longitude: flight.Long}}
+            image={flightImg} 
+            style={{ transform: [{ rotate: '30deg'}] }}           
         />
       );
     });
