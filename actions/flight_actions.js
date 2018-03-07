@@ -2,7 +2,8 @@ import axios from 'axios';
 import qs from 'qs';
 
 import {
-  FETCH_FLIGHTS
+  FETCH_FLIGHTS,
+  SELECTED_FLIGHT
 } from './types';
 
 const FLIGHTS_ROOT_URL = 'https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json?';
@@ -25,4 +26,8 @@ export const fetchFlights = (region) => async (dispatch) => {
   } catch(e) {
     console.error(e);
   }
+};
+
+export const selectFlight = (flight) => (dispatch) => {
+  dispatch({ type: SELECTED_FLIGHT, payload: flight });
 };

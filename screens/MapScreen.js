@@ -6,7 +6,8 @@ import { Button, Icon } from 'react-native-elements';
 
 import * as actions from '../actions';
 
-import flightImg from '../assets/plane.png';
+import flightImg from '../assets/black-plane.png';
+import selectedFlightImg from '../assets/red-plane.png';
 
 class MapScreen extends Component {
   static navigationOptions = {
@@ -49,17 +50,14 @@ componentWillMount() {
                               longitude: location.coords.longitude, 
                               latitudeDelta: this.state.region.latitudeDelta, 
                               longitudeDelta: this.state.region.longitudeDelta }});
-    this.props.fetchFlights(this.state.region);
   };
 
   componentDidMount() {
     this.setState({ mapLoaded: true });
+    setInterval(() => this.props.fetchFlights(this.state.region), 3000);
   }
 
   onRegionChangeComplete = (region) => {
-    if (region.latitude !== 0 && region.longitude !== 0) {
-      this.props.fetchFlights(region);
-    }
     this.setState({ region});
   }
 
@@ -69,7 +67,14 @@ componentWillMount() {
   }
 
   markerClick(flight) {
-    console.log("popo", flight);
+    this.props.selectFlight(flight);
+  }
+
+  getFlightImage(flight) {
+    if (this.props.selectedFlight !== null && flight.Id === this.props.selectedFlight.Id) {
+      return selectedFlightImg;
+    }
+    return flightImg;
   }
 
   renderPoints = () => {    
@@ -80,13 +85,30 @@ componentWillMount() {
         <MapView.Marker
             key={flight.Id}
             coordinate={{latitude: flight.Lat, longitude: flight.Long}}
-            image={flightImg} 
+            image={this.getFlightImage(flight)} 
             style={{ transform: [{ rotate: this._getFlightAngle(flight)}] }}           
             onPress= {()=>this.markerClick(flight)}
         />        
       );
     } 
     });
+  }
+
+  closeFlightInfo() {
+    this.props.selectFlight(null);
+  }
+
+  renderSelectedFlight() {
+    const flight = this.props.selectedFlight;
+    if (flight !== null) {
+      return(
+        <View>
+          <Text>Selected flight</Text>
+          <Text>Icao {flight.Icao}</Text>
+          <Button title="Close" onPress={()=>this.closeFlightInfo()}>Close</Button>
+        </View>
+      )
+    }
   }
 
   render() {    
@@ -106,14 +128,15 @@ componentWillMount() {
           onRegionChangeComplete={this.onRegionChangeComplete}
         >
           {this.renderPoints()}
-        </MapView>        
+        </MapView>    
+        {this.renderSelectedFlight()}    
       </View>
     );
   }
 }
 
 function mapStateToProps({ flights }) {
-  return { flights: flights.results };
+  return { flights: flights.results, selectedFlight: flights.selectedFlight };
 }
 
 export default connect(mapStateToProps, actions)(MapScreen);
