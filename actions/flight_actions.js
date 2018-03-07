@@ -20,7 +20,6 @@ const buildFlightsUrl = (latitude, longitude) => {
 export const fetchFlights = (region) => async (dispatch) => {
   try {
     const url = buildFlightsUrl(region.latitude, region.longitude);
-    console.log(url);
     let {data} = await axios.get(url);
     dispatch({ type: FETCH_FLIGHTS, payload: data.acList });
   } catch(e) {

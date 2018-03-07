@@ -10,7 +10,10 @@ import flightImg from '../assets/plane.png';
 
 class MapScreen extends Component {
   static navigationOptions = {
-    title: 'Map'
+    title: 'Map',
+    tabBarIcon:  ({ tintColor }) => {
+      return <Icon name="map" size={30} color={tintColor} />;      
+    }
   }
 
   state = {
@@ -54,7 +57,9 @@ componentWillMount() {
   }
 
   onRegionChangeComplete = (region) => {
-    this.props.fetchFlights(region);
+    if (region.latitude !== 0 && region.longitude !== 0) {
+      this.props.fetchFlights(region);
+    }
     this.setState({ region});
   }
 
@@ -63,18 +68,24 @@ componentWillMount() {
     return (flight.Trak -90)+'deg';
   }
 
+  markerClick(flight) {
+    console.log("popo", flight);
+  }
+
   renderPoints = () => {    
     return this.props.flights.map((flight, index) => {
-      console.log(flight);
+      //console.log(flight);
+      if (index < 20) {
       return (
         <MapView.Marker
             key={flight.Id}
-            title={flight.Icao}
             coordinate={{latitude: flight.Lat, longitude: flight.Long}}
             image={flightImg} 
             style={{ transform: [{ rotate: this._getFlightAngle(flight)}] }}           
-        />
+            onPress= {()=>this.markerClick(flight)}
+        />        
       );
+    } 
     });
   }
 
