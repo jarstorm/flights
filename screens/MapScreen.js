@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, ActivityIndicator, Platform, Dimensions } from 'react-native';
 import { MapView, Constants, Location, Permissions } from 'expo';
 import { connect } from 'react-redux';
 import { Button, Icon } from 'react-native-elements';
@@ -54,7 +54,7 @@ componentWillMount() {
 
   componentDidMount() {
     this.setState({ mapLoaded: true });
-    setInterval(() => this.props.fetchFlights(this.state.region), 3000);
+    setInterval(() => this.props.fetchFlights(this.state.region), 5000);
   }
 
   onRegionChangeComplete = (region) => {
@@ -79,7 +79,6 @@ componentWillMount() {
 
   renderPoints = () => {    
     return this.props.flights.map((flight, index) => {
-      //console.log(flight);
       if (index < 20) {
       return (
         <MapView.Marker
@@ -102,29 +101,34 @@ componentWillMount() {
     const flight = this.props.selectedFlight;
     if (flight !== null) {
       return(
-        <View>
-          <Text>Selected flight</Text>
-          <Text>Icao {flight.Icao}</Text>
-          <Button title="Close" onPress={()=>this.closeFlightInfo()}>Close</Button>
+        <View style={styles.bubble}>
+          <Text style={styles.selectedText}>Selected flight</Text>
+          <Text style={styles.selectedText}>Icao {flight.Icao}</Text>
+          <Text style={styles.selectedText}>Id {flight.Id}</Text>
+          <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+          <Button title="Close" onPress={()=>this.closeFlightInfo() } style={styles.button}>Close</Button>
+          <Button title="Follow" onPress={()=>this.closeFlightInfo() } style={styles.button}>Follow</Button>
+          <Button title="More" onPress={()=>this.closeFlightInfo() } style={styles.button}>More</Button>
+          </View>
         </View>
       )
     }
   }
 
-  render() {    
+  render() {     
     if (!this.state.mapLoaded) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center' }}>
+        <View>
           <ActivityIndicator size="large" />
         </View>
       );
     }
 
     return (
-      <View style={{ flex: 1 }}>
+      <View style={styles.container}>
         <MapView
           region={this.state.region}
-          style={{ flex: 1 }}
+          style={styles.map}
           onRegionChangeComplete={this.onRegionChangeComplete}
         >
           {this.renderPoints()}
@@ -134,6 +138,41 @@ componentWillMount() {
     );
   }
 }
+
+const styles = {
+  container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  bubble: {    
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    borderRadius: 20,
+    marginVertical: 20,
+    width: Dimensions.get('window').width - 20
+  },
+  button: {
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  selectedText: {
+    color: 'white'
+  }
+};
 
 function mapStateToProps({ flights }) {
   return { flights: flights.results, selectedFlight: flights.selectedFlight };

@@ -12,20 +12,24 @@ const FLIGHTS_QUERY_PARAMS = {
   fDstU: 100
 };
 
-const buildFlightsUrl = (latitude, longitude) => {
-  const query = qs.stringify({ ...FLIGHTS_QUERY_PARAMS, lat: latitude, lng: longitude });
+const buildFlightsUrl = (latitude, longitude, longitudeDelta) => {
+  let zoom = Math.round(Math.log(360 / longitudeDelta) / Math.LN2); 
+  const metersPerPx = 156543.03392 * Math.cos(latitude * Math.PI / 180) / Math.pow(2, zoom);
+  const query = qs.stringify({ ...FLIGHTS_QUERY_PARAMS, lat: latitude, lng: longitude, fDstU: metersPerPx/4 });
   return `${FLIGHTS_ROOT_URL}${query}`;
 };
 
 
 export const fetchFlights = (region) => async (dispatch) => {
-  try {
-    const url = buildFlightsUrl(region.latitude, region.longitude);
-    let {data} = await axios.get(url);
-    dispatch({ type: FETCH_FLIGHTS, payload: data.acList });
-  } catch(e) {
-    console.error(e);
-  }
+  if (region.longitude !== 0 && region.latitude !== 0) {
+    try {
+      const url = buildFlightsUrl(region.latitude, region.longitude, region.longitudeDelta);
+      let {data} = await axios.get(url);
+      dispatch({ type: FETCH_FLIGHTS, payload: data.acList });
+    } catch(e) {
+      console.error(e);
+    }
+  } 
 };
 
 export const selectFlight = (flight) => (dispatch) => {
