@@ -97,6 +97,10 @@ componentWillMount() {
     this.props.selectFlight(null);
   }
 
+  showFlightInfo() {
+    this.props.navigation.navigate('info');
+  }
+
   renderSelectedFlight() {
     const flight = this.props.selectedFlight;
     if (flight !== null) {
@@ -108,7 +112,7 @@ componentWillMount() {
           <View style={{flexDirection: 'row', justifyContent: 'center'}}>
           <Button title="Close" onPress={()=>this.closeFlightInfo() } style={styles.button}>Close</Button>
           <Button title="Follow" onPress={()=>this.closeFlightInfo() } style={styles.button}>Follow</Button>
-          <Button title="More" onPress={()=>this.closeFlightInfo() } style={styles.button}>More</Button>
+          <Button title="More" onPress={()=>this.showFlightInfo() } style={styles.button}>More</Button>
           </View>
         </View>
       )
